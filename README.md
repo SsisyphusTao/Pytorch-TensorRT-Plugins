@@ -15,4 +15,5 @@ Then, you can directly use `DeformableConv2DLayer` in `dcn_v2_wrapper.py` or ref
 
 ### TensorRT
 
-Copy everything under folder `tensorrtPlugin` to `[TensorRT](https://github.com/NVIDIA/TensorRT)/plugin`.
+Copy everything under folder `tensorrtPlugin` to `[TensorRT](https://github.com/NVIDIA/TensorRT)/plugin`.  
+See `examples/trtExample.py` to find how to use it with python.
