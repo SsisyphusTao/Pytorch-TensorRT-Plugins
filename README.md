@@ -1,6 +1,6 @@
 # DCNv2 - Pytorch/TensorRT
 
-Two plugin implementations of dcnv2 for pytorch and tensorRT.
+Two plugin implementations of dcnv2 for Pytorch1.5+ and TensorRT7.
 
 Easy use and easy understand.
 
