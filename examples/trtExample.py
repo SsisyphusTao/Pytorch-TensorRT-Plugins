@@ -7,6 +7,10 @@ TRT_LOGGER = trt.Logger()
 trt.init_libnvinfer_plugins(TRT_LOGGER, '')
 PLUGIN_CREATORS = trt.get_plugin_registry().plugin_creator_list
 
+def sigmoid(x):
+    s = 1 / (1 + np.exp(-x))
+    return s
+
 def get_trt_plugin(plugin_name):
         plugin = None
         for plugin_creator in PLUGIN_CREATORS:
@@ -27,9 +31,9 @@ def main():
     with trt.Builder(TRT_LOGGER) as builder, builder.create_network(flags=common.EXPLICIT_BATCH) as network:
         builder.max_workspace_size = common.GiB(1)
         input_layer = network.add_input(name="input_layer", dtype=trt.float32, shape=(1, 2, 4, 4))
-        offset_layer = network.add_input(name="offset_layer", dtype=trt.float32, shape=(18, 4, 4))
-        mask_layer = network.add_input(name="mask_layer", dtype=trt.float32, shape=(9, 4, 4))
-        lrelu = network.add_plugin_v2(inputs=[input_layer, offset_layer, mask_layer], plugin=get_trt_plugin("DCNv2_TRT"))
+        offset_mask_layer = network.add_input(name="offset_layer", dtype=trt.float32, shape=(27, 4, 4))
+        offset_mask_sigmoid_layer = network.add_input(name="mask_layer", dtype=trt.float32, shape=(27, 4, 4))
+        lrelu = network.add_plugin_v2(inputs=[input_layer, offset_mask_layer, offset_mask_sigmoid_layer], plugin=get_trt_plugin("DCNv2_TRT"))
         lrelu.get_output(0).name = "outputs"
         network.mark_output(lrelu.get_output(0))
 
@@ -37,8 +41,9 @@ def main():
         inputs, outputs, bindings, stream = common.allocate_buffers(engine)
         with engine.create_execution_context() as context:
             np.copyto(inputs[0].host, np.random.randn(1, 2, 4, 4).ravel())
-            np.copyto(inputs[1].host, np.random.randn(18, 4, 4).ravel())
-            np.copyto(inputs[2].host, np.random.randn(9, 4, 4).ravel())
+            offset_mask = np.random.randn(27, 4, 4).ravel() #create by convolution layer in network
+            np.copyto(inputs[1].host, offset_mask.ravel())
+            np.copyto(inputs[2].host, sigmoid(offset_mask).ravel())
             output = common.do_inference_v2(context, bindings=bindings, inputs=inputs, outputs=outputs, stream=stream)
             print(output, output[0].shape)
 

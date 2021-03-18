@@ -44,6 +44,8 @@ DeformableConvolutionalLayer::DeformableConvolutionalLayer(const void* buffer, s
     const char* d = static_cast<const char*>(buffer);
     const char* a = d;
     in_channels = read<int>(d);
+    height = read<int>(d);
+    width = read<int>(d);
     height_out = read<int>(d);
     width_out = read<int>(d);
 
@@ -101,7 +103,8 @@ int DeformableConvolutionalLayer::enqueue(int batchSize, const void* const* inpu
 {
     const float* input = static_cast<const float *>(inputs[0]);
     const float* offset = static_cast<const float *>(inputs[1]);
-    const float* mask = static_cast<const float *>(inputs[2]);
+    const float* offset_mask = static_cast<const float *>(inputs[2]);
+    const float* mask = offset_mask + deformable_group * 2 * kernel_size * kernel_size * height * width;
     float * output = static_cast<float *>(outputs[0]);
 
     float alpha{1}, beta{0};
@@ -139,13 +142,15 @@ int DeformableConvolutionalLayer::enqueue(int batchSize, const void* const* inpu
 
 size_t DeformableConvolutionalLayer::getSerializationSize() const
 {
-    return sizeof(int) * 16 + (mWeight.count + mBias.count) * sizeof(float);
+    return sizeof(int) * 13 + (mWeight.count + mBias.count) * sizeof(float);
 }
 
 void DeformableConvolutionalLayer::serialize(void* buffer) const
 {
     char *d = reinterpret_cast<char*>(buffer), *a = d;
     write(d, in_channels);
+    write(d, height);
+    write(d, width);
     write(d, height_out);
     write(d, width_out);
 

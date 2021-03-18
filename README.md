@@ -15,5 +15,12 @@ Then, you can directly use `DeformableConv2DLayer` in `dcn_v2_wrapper.py` or ref
 
 ### TensorRT
 
-Copy everything under folder `tensorrtPlugin` to `[TensorRT](https://github.com/NVIDIA/TensorRT)/plugin`.  
-See `examples/trtExample.py` to find how to use it with python.
+Copy all files in this folder to [TensorRT](https://github.com/NVIDIA/TensorRT)/plugin and build.
+See `examples/trtExample.py` to find how to use it in python.
+
+## EXAMPLE
+
+I provide `examples/mobilenetv3.py` and `examples/mbv2ct.py` to show how to use dcnv2 in mobilenetv3-centernet in pytorch and how to transfer it into tensorrt.
+I also provide a model for evaluation.
+The evaluation output is like this:
+![eval.png](eval.png)
