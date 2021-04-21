@@ -1,8 +1,13 @@
-# DCNv2 - Pytorch/TensorRT
+# Plugins for Pytorch & TensorRT
 
-Two plugin implementations of dcnv2 for Pytorch1.5+ and TensorRT7.
+It's a personal backup repository, but I will try my best to help you understand how to use them.
 
-Easy use and easy understand.
+Now it contains:
+|||
+|-|-|
+|Deformable Convolutional Layer (DCNv2) | pytorch1.5+/tensorrt7 |
+|Yolov5 Detection Head|tensorrt7|
+
 
 ## HOW TO USE
 

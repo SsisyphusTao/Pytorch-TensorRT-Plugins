@@ -54,6 +54,7 @@ using namespace nvinfer1::plugin;
 #include "specialSlicePlugin.h"
 #include "split.h"
 #include "dcnv2Plugin.h"
+#include "yoloPlugin.h"
 
 using nvinfer1::plugin::RPROIParams;
 
@@ -190,6 +191,7 @@ extern "C"
         initializePlugin<nvinfer1::plugin::SpecialSlicePluginCreator>(logger, libNamespace);
         initializePlugin<nvinfer1::plugin::SplitPluginCreator>(logger, libNamespace);
         initializePlugin<nvinfer1::plugin::DCNv2PluginCreator>(logger, libNamespace);
+        initializePlugin<nvinfer1::plugin::YoloPluginCreator>(logger, libNamespace);
         return true;
     }
 } // extern "C"

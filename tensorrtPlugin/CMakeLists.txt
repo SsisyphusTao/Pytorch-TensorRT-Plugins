@@ -56,6 +56,7 @@ set(PLUGIN_LISTS
     specialSlicePlugin
     splitPlugin
     dcnv2Plugin
+    yoloPlugin
     )
 
 # Add BERT sources if ${BERT_GENCODES} was populated

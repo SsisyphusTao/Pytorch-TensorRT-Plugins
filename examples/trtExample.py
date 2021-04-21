@@ -27,6 +27,22 @@ def get_trt_plugin(plugin_name):
                 plugin = plugin_creator.create_plugin(name=plugin_name, field_collection=field_collection)
         return plugin
 
+def add_yoloHead(network, input_tensors):
+        for plugin_creator in PLUGIN_CREATORS:
+            if plugin_creator.name == 'Yolo_TRT':
+                YoloCreator = plugin_creator
+        anchors = np.array([[10, 13, 16, 30, 33, 23], [30, 61, 62, 45, 59, 119], [116, 90, 156, 198, 373, 326]], dtype=np.float32)
+        num_cls = trt.PluginField("num_cls", np.array([3], dtype=np.int32), trt.PluginFieldType.INT32)
+        max_det = trt.PluginField("max_det", np.array([3360], dtype=np.int32), trt.PluginFieldType.INT32)
+        heights = trt.PluginField("heights", np.array([80,40,20], dtype=np.int32), trt.PluginFieldType.INT32)
+        widths  = trt.PluginField("widths", np.array([128,64,32], dtype=np.int32), trt.PluginFieldType.INT32)
+        strides = trt.PluginField("strides", np.array([8,16,32], dtype=np.int32), trt.PluginFieldType.INT32)
+        anchors = trt.PluginField("anchors", anchors, trt.PluginFieldType.FLOAT32)
+        field_collection = trt.PluginFieldCollection([num_cls, max_det, heights, widths, strides, anchors])
+        yoloHead = YoloCreator.create_plugin(name='Yolo_TRT', field_collection=field_collection)
+
+        return network.add_plugin_v2(inputs=[x.get_output(0) for x in input_tensors], plugin=yoloHead)
+
 def main():
     with trt.Builder(TRT_LOGGER) as builder, builder.create_network(flags=common.EXPLICIT_BATCH) as network:
         builder.max_workspace_size = common.GiB(1)
