@@ -3,7 +3,7 @@
 
 #define NUM_HEAD 3
 #define NUM_ANCH 3
-#define CONF_THRES 0.4f
+#define CONF_THRES 0.6f
 
 using namespace nvinfer1;
 using nvinfer1::plugin::YoloDetectLayer;
@@ -89,7 +89,7 @@ YoloDetectLayer::YoloDetectLayer(const void* buffer, size_t length)
 int YoloDetectLayer::getNbOutputs() const
 {
     // Plugin layer has 2 outputs
-    return 3;
+    return 2;
 }
 
 int YoloDetectLayer::initialize()
@@ -102,9 +102,8 @@ Dims YoloDetectLayer::getOutputDimensions(int index, const Dims* inputs, int nbI
     ASSERT(index == 0 || index == 1 || index == 2);
     ASSERT(nbInputs == 3);
 
-    if (index==0) return Dims3(mMaxdet*4, 1, 1);
-    else if (index==1) return Dims3(mMaxdet*mNumcls, 1, 1);
-    else return Dims3(2, mMaxdet*4, 1);
+    if (index==0) return Dims3(mMaxdet, 1, 4);
+    else return Dims2(mMaxdet, mNumcls);
 }
 
 size_t YoloDetectLayer::getWorkspaceSize(int maxBatchSize) const
@@ -126,9 +125,9 @@ __global__ void Reshape(const float *input, float *loc, float *cof, int w, int h
 
         if (count >= mMaxdet-1) return;
 
-        for (int i = 5; i < infoLen; ++i)
+        for (int i = 0; i < numClass; ++i)
         { 
-            cof[numClass * count + i] = input[(anchorPos*infoLen+i)*mapSize+mapPos];
+            cof[numClass * count + i] = input[(anchorPos*infoLen+i+5)*mapSize+mapPos];
         }
 
         int row = mapPos / w;
@@ -160,7 +159,6 @@ int YoloDetectLayer::enqueue(int batchSize, const void* const* inputs, void** ou
     CUASSERT(cudaMemset(count, 0, sizeof(int)));
     CUASSERT(cudaMemset(outputs[0], 0, mMaxdet*4*sizeof(float)));
     CUASSERT(cudaMemset(outputs[1], 0, mMaxdet*mNumcls*sizeof(float)));
-    CUASSERT(cudaMemset(outputs[2], 0, 2*mMaxdet*4*sizeof(float)));
 
     for (int i=0; i<NUM_HEAD; i++)
     {

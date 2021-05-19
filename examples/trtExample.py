@@ -33,7 +33,7 @@ def add_yoloHead(network, input_tensors):
                 YoloCreator = plugin_creator
         anchors = np.array([[10, 13, 16, 30, 33, 23], [30, 61, 62, 45, 59, 119], [116, 90, 156, 198, 373, 326]], dtype=np.float32)
         num_cls = trt.PluginField("num_cls", np.array([3], dtype=np.int32), trt.PluginFieldType.INT32)
-        max_det = trt.PluginField("max_det", np.array([3360], dtype=np.int32), trt.PluginFieldType.INT32)
+        max_det = trt.PluginField("max_det", np.array([13440], dtype=np.int32), trt.PluginFieldType.INT32)
         heights = trt.PluginField("heights", np.array([80,40,20], dtype=np.int32), trt.PluginFieldType.INT32)
         widths  = trt.PluginField("widths", np.array([128,64,32], dtype=np.int32), trt.PluginFieldType.INT32)
         strides = trt.PluginField("strides", np.array([8,16,32], dtype=np.int32), trt.PluginFieldType.INT32)
