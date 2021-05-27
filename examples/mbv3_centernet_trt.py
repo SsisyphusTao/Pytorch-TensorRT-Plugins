@@ -4,7 +4,7 @@ import tensorrt as trt
 import torch
 
 import common
-from mobilenetv3 import get_pose_net
+from mbv3_centernet_pytorch import get_pose_net
 
 import time
 
@@ -258,7 +258,7 @@ def main():
             [baseline] = mobilenetv3.cuda()(torch.from_numpy(img).cuda())
             print('baseline: ', baseline['hm'].mean().cpu().numpy(), baseline['wh'].mean().cpu().numpy(), baseline['reg'].mean().cpu().numpy())
         print('output:   ', np.mean(hm), np.mean(wh), np.mean(reg))
-    print(t)
+    print('Time: ', t)
 
 if __name__ == '__main__':
     main()

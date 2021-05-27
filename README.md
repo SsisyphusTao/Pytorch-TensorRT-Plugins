@@ -3,15 +3,19 @@
 It's a personal backup repository, but I will try my best to help you understand how to use them.
 
 Now it contains:
-|||
+|Plugins||
 |-|-|
-|Deformable Convolutional Layer (DCNv2) | pytorch1.5+/tensorrt7 |
-|Yolov5 Detection Head|tensorrt7|
+|DCNv2 | pytorch1.5+/tensorrt7 |
+|yolov5 detection | tensorrt7|
 
+|Models||
+|-|-|
+|mobilenetv3-centernet | pytorch1.5+/tensorrt7 |
+|yolov5 (integrated with detection and nms) | tensorrt7 |
 
 ## HOW TO USE
 
-### pytorch
+### Pytorch
 
 >`cd pytorchExtension`  
 >`python ./setup.py install --user(optioanl)`  
@@ -21,11 +25,10 @@ Then, you can directly use `DeformableConv2DLayer` in `dcn_v2_wrapper.py` or ref
 ### TensorRT
 
 Copy all files in `tensorrtPlugin` folder to [TensorRT](https://github.com/NVIDIA/TensorRT)/plugin and build.
-See `examples/trtExample.py` to find how to use it in python.
+
 
 ## EXAMPLE
 
-I provide `examples/mobilenetv3.py` and `examples/mbv2ct.py` to show how to use dcnv2 in mobilenetv3-centernet in pytorch and how to transfer it into tensorrt.
-I also provide a model for evaluation.
-The evaluation output is like this:  
-![eval.png](https://raw.githubusercontent.com/SsisyphusTao/DCNv2-Pytorch-TensorRT7/master/examples/eval.png)
+I provide two models to show how these plugins work.  
+I also provide a mobilenetv3-centernet model for evaluation, if all environment settled, `cd examples` and run `python mbv3_centernet_trt.py`
+The evaluation output is as follow which are mean values of `hm`, `wh`, `reg`
