@@ -86,18 +86,18 @@ YoloDetectLayer::YoloDetectLayer(const void* buffer, size_t length)
     ASSERT(d == a + length);
 }
 
-int YoloDetectLayer::getNbOutputs() const
+int YoloDetectLayer::getNbOutputs() const noexcept
 {
     // Plugin layer has 2 outputs
     return 2;
 }
 
-int YoloDetectLayer::initialize()
+int YoloDetectLayer::initialize() noexcept
 {
     return STATUS_SUCCESS; 
 }
 
-Dims YoloDetectLayer::getOutputDimensions(int index, const Dims* inputs, int nbInputs)
+Dims YoloDetectLayer::getOutputDimensions(int index, const Dims* inputs, int nbInputs) noexcept
 {
     ASSERT(index == 0 || index == 1 || index == 2);
     ASSERT(nbInputs == 3);
@@ -106,7 +106,7 @@ Dims YoloDetectLayer::getOutputDimensions(int index, const Dims* inputs, int nbI
     else return Dims2(mMaxdet, mNumcls);
 }
 
-size_t YoloDetectLayer::getWorkspaceSize(int maxBatchSize) const
+size_t YoloDetectLayer::getWorkspaceSize(int maxBatchSize) const noexcept
 {
     return 0;
 }
@@ -150,7 +150,7 @@ __global__ void Reshape(const float *input, float *loc, float *cof, int w, int h
 }
 
 
-int YoloDetectLayer::enqueue(int batchSize, const void* const* inputs, void** outputs, void* workspace, cudaStream_t stream)
+int YoloDetectLayer::enqueue(int batchSize, const void* const* inputs, void* const* outputs, void* workspace, cudaStream_t stream) noexcept
 {
     float* loc = static_cast<float *>(outputs[0]);
     float* cof = static_cast<float *>(outputs[1]);
@@ -169,14 +169,14 @@ int YoloDetectLayer::enqueue(int batchSize, const void* const* inputs, void** ou
     return 0;
 }
 
-size_t YoloDetectLayer::getSerializationSize() const
+size_t YoloDetectLayer::getSerializationSize() const noexcept
 {
     return sizeof(int) * 12 + mAnchors.count * sizeof(float);
 }
 
-void YoloDetectLayer::serialize(void* buffer) const
+void YoloDetectLayer::serialize(void* buffer) const noexcept
 {
-    char *d = reinterpret_cast<char*>(buffer), *a = d;
+    char *d = static_cast<char*>(buffer), *a = d;
     write(d, mNumcls);
     write(d, mMaxdet);
 
@@ -192,9 +192,9 @@ void YoloDetectLayer::serialize(void* buffer) const
     ASSERT(d == a + getSerializationSize());
 }
 
-bool YoloDetectLayer::supportsFormat(DataType type, PluginFormat format) const
+bool YoloDetectLayer::supportsFormat(DataType type, PluginFormat format) const noexcept
 {
-    return (type == DataType::kFLOAT && format == PluginFormat::kNCHW);
+    return (type == DataType::kFLOAT && format == PluginFormat::kLINEAR);
 }
 
 Weights YoloDetectLayer::copyToDevice(const void* hostData, size_t count)
@@ -218,17 +218,17 @@ Weights YoloDetectLayer::deserializeToDevice(const char*& hostBuffer, size_t cou
     return w;
 }
 
-const char* YoloDetectLayer::getPluginType() const
+const char* YoloDetectLayer::getPluginType() const noexcept
 {
     return Yolo_PLUGIN_NAME;
 }
 
-const char* YoloDetectLayer::getPluginVersion() const
+const char* YoloDetectLayer::getPluginVersion() const noexcept
 {
     return Yolo_PLUGIN_VERSION;
 }
 
-void YoloDetectLayer::terminate() {
+void YoloDetectLayer::terminate() noexcept {
     if (count)
     {
         cudaFree(count);
@@ -236,12 +236,12 @@ void YoloDetectLayer::terminate() {
     }
 }
 
-void YoloDetectLayer::destroy()
+void YoloDetectLayer::destroy() noexcept
 {
     delete this;
 }
 
-IPluginV2Ext* YoloDetectLayer::clone() const
+IPluginV2Ext* YoloDetectLayer::clone() const noexcept
 {
     IPluginV2Ext* plugin = new YoloDetectLayer(*this);
     plugin->setPluginNamespace(mPluginNamespace.c_str());
@@ -249,30 +249,30 @@ IPluginV2Ext* YoloDetectLayer::clone() const
 }
 
 // Set plugin namespace
-void YoloDetectLayer::setPluginNamespace(const char* pluginNamespace)
+void YoloDetectLayer::setPluginNamespace(const char* pluginNamespace) noexcept
 {
     mPluginNamespace = pluginNamespace;
 }
 
-const char* YoloDetectLayer::getPluginNamespace() const
+const char* YoloDetectLayer::getPluginNamespace() const noexcept
 {
     return mPluginNamespace.c_str();
 }
 
 // Return the DataType of the plugin output at the requested index.
-DataType YoloDetectLayer::getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const
+DataType YoloDetectLayer::getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const noexcept
 {
     // Only DataType::kFLOAT is acceptable by the plugin layer
     return DataType::kFLOAT;
 }
 // Return true if output tensor is broadcast across a batch.
-bool YoloDetectLayer::isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const
+bool YoloDetectLayer::isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const noexcept
 {
     return false;
 }
 
 // Return true if plugin can use input that is broadcast across batch without replication.
-bool YoloDetectLayer::canBroadcastInputAcrossBatch(int inputIndex) const
+bool YoloDetectLayer::canBroadcastInputAcrossBatch(int inputIndex) const noexcept
 {
     return false;
 }
@@ -287,19 +287,19 @@ bool YoloDetectLayer::canBroadcastInputAcrossBatch(int inputIndex) const
 // maxbatchSize: maximum batch size for the plugin layer
 void YoloDetectLayer::configurePlugin(const Dims* inputDims, int nbInputs, const Dims* outputDims, int nbOutputs,
     const DataType* inputTypes, const DataType* outputTypes, const bool* inputIsBroadcast,
-    const bool* outputIsBroadcast, PluginFormat floatFormat, int maxBatchSize)
+    const bool* outputIsBroadcast, PluginFormat floatFormat, int maxBatchSize) noexcept
 {
-    ASSERT(*inputTypes == DataType::kFLOAT && floatFormat == PluginFormat::kNCHW);
+    ASSERT(*inputTypes == DataType::kFLOAT && floatFormat == PluginFormat::kLINEAR);
 }
 
 // Attach the plugin object to an execution context and grant the plugin the access to some context resource.
-void YoloDetectLayer::attachToContext(cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator)
+void YoloDetectLayer::attachToContext(cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator) noexcept
 {
 
 }
 
 // Detach the plugin object from its execution context.
-void YoloDetectLayer::detachFromContext() {}
+void YoloDetectLayer::detachFromContext() noexcept {}
 
 YoloPluginCreator::YoloPluginCreator()
 {
@@ -314,22 +314,22 @@ YoloPluginCreator::YoloPluginCreator()
     mFC.fields = mPluginAttributes.data();
 }
 
-const char* YoloPluginCreator::getPluginName() const
+const char* YoloPluginCreator::getPluginName() const noexcept
 {
     return Yolo_PLUGIN_NAME;
 }
 
-const char* YoloPluginCreator::getPluginVersion() const
+const char* YoloPluginCreator::getPluginVersion() const noexcept
 {
     return Yolo_PLUGIN_VERSION;
 }
 
-const PluginFieldCollection* YoloPluginCreator::getFieldNames()
+const PluginFieldCollection* YoloPluginCreator::getFieldNames() noexcept
 {
     return &mFC;
 }
 
-IPluginV2Ext* YoloPluginCreator::createPlugin(const char* name, const PluginFieldCollection* fc)
+IPluginV2Ext* YoloPluginCreator::createPlugin(const char* name, const PluginFieldCollection* fc) noexcept
 {
     int num_cls, max_det;
     std::vector<int> heights, widths;
@@ -408,7 +408,7 @@ IPluginV2Ext* YoloPluginCreator::createPlugin(const char* name, const PluginFiel
     return obj;
 }
 
-IPluginV2Ext* YoloPluginCreator::deserializePlugin(const char* name, const void* serialData, size_t serialLength)
+IPluginV2Ext* YoloPluginCreator::deserializePlugin(const char* name, const void* serialData, size_t serialLength) noexcept
 {
     // This object will be deleted when the network is destroyed, which will
     // call Normalize::destroy()
