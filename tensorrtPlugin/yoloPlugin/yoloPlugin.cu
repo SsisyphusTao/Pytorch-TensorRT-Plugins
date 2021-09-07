@@ -166,6 +166,7 @@ int YoloDetectLayer::enqueue(int batchSize, const void* const* inputs, void** ou
         Reshape <<< GET_BLOCKS_(mHeights[i]*mWidths[i]*NUM_ANCH), CUDA_NUM_THREADS, 0, stream >>>
             (static_cast<const float *>(inputs[i]), loc, cof, mWidths[i], mHeights[i], mNumcls, mMaxdet, mStrides[i], anchors, count);
     }
+    cudaFree(count);
     return 0;
 }
 
