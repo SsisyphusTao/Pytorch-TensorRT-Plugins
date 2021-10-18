@@ -27,12 +27,21 @@ Now it contains:
 
 1. Copy plugin folders from `tensorrt` to [`NVIDIA/TensorRT/plugin`](https://github.com/NVIDIA/TensorRT/tree/master/plugin)
 
-[InferPlugin.cpp](https://github.com/NVIDIA/TensorRT/blob/master/plugin/InferPlugin.cpp)
-[CMakeLists.txt](https://github.com/NVIDIA/TensorRT/blob/master/plugin/CMakeLists.txt)
+2. Add relative head file and initializePlugin() to [InferPlugin.cpp](https://github.com/NVIDIA/TensorRT/blob/master/plugin/InferPlugin.cpp) at proper place, for example
+
+>`#include "dcnv2Plugin.h"`  
+>`#include "yoloPlugin.h"`
+
+>`initializePlugin<nvinfer1::plugin::DCNv2PluginCreator>(logger, libNamespace);`
+>`initializePlugin<nvinfer1::plugin::YoloPluginCreator>(logger, libNamespace);`
+
+3. Add name of plugin folder to `PLUGIN_LISTS` in [CMakeLists.txt](https://github.com/NVIDIA/TensorRT/blob/master/plugin/CMakeLists.txt)
+
+4. Build and use `libnvinfer_plugin.so` following offical introduction.
 
 ## EXAMPLES
 
-Therea are two pytorch2tensorrt transfer scripts in `examples` to show how these plugins work.  
+There are two pytorch2tensorrt transfer scripts in `examples` to show how these plugins work.  
 
 ### Evaluation
 
@@ -40,3 +49,4 @@ Therea are two pytorch2tensorrt transfer scripts in `examples` to show how these
 >`python mbv3_centernet_trt7.py`  
 
 The evaluation output is as follow which are mean values of `hm`, `wh`, `reg`  
+![eval](https://user-images.githubusercontent.com/47047345/137699271-534c7a92-99d0-47f6-8628-3904b4041c61.png)
