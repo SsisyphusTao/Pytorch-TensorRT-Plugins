@@ -1,3 +1,5 @@
 build
 dist
+*.trt
 *.egg-info
+*__pycache__

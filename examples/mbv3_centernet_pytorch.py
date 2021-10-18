@@ -6,7 +6,7 @@ import math
 import torch.nn.functional as F
 from torch import nn
 from torch.nn import init
-from .dcn_v2_wrapper import DeformableConv2DLayer as DCN
+from dcn_v2_wrapper import DeformableConv2DLayer as DCN
 
 
 class DeformConv(nn.Module):
@@ -16,8 +16,8 @@ class DeformConv(nn.Module):
             nn.BatchNorm2d(cho, momentum=0.1),
             nn.ReLU(inplace=True)
         )
-        # self.conv = DCN(chi, cho, kernel_size=(3, 3), stride=1, padding=1, dilation=1, deformable_groups=1)
-        self.conv = nn.Conv2d(chi, cho, kernel_size=(3,3), stride=1, padding=1, bias=False)
+        self.conv = DCN(chi, cho, kernel_size=(3, 3), stride=1, padding=1, dilation=1, deformable_groups=1)
+        # self.conv = nn.Conv2d(chi, cho, kernel_size=(3,3), stride=1, padding=1, bias=False)
 
     def forward(self, x):
         x = self.conv(x)
